@@ -1,0 +1,2 @@
+# Difficulty-in-Accessing-Government-Services-for-Rural-or-Elderly-Citizens
+Many rural or elderly individuals struggle to navigate complex government websites or portals to access basic services like pension, healthcare, or ration benefits. There is a need for a tool that allows users to describe their problem in simple language (e.g., “I want my pension details”) and get a guided, accessible digital experience.
