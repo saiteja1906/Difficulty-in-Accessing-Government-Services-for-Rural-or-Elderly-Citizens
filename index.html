@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EasyGov - Unified MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1faff;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.12);
+    }
+    textarea, button, input, select {
+      width: 100%;
+      font-size: 16px;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    nav button {
+      width: calc(50% - 10px);
+      padding: 14px;
+      font-size: 16px;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    summary {
+      font-weight: bold;
+      cursor: pointer;
+      background: #eef;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    details {
+      margin-bottom: 10px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .tel-link {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    .feedback-entry {
+      background: #f9f9f9;
+      border-left: 4px solid #3498db;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .chat-box {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      background: #fafafa;
+      margin-bottom: 10px;
+    }
+    .chat-box p {
+      margin: 5px 0;
+    }
+    .user-msg { color: #000; }
+    .bot-msg { color: #3498db; font-style: italic; }
+    .hidden-section {
+      display: none;
+      margin-top: 20px;
+    }
+    .login-section {
+      text-align: center;
+      padding: 20px;
+    }
+    .login-section input {
+      max-width: 300px;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>EasyGov Help Desk 🏛️</h2>
+    {% if user %}
+      <p style="font-size:18px; color:#3498db;">Welcome, {{ user.name }}!</p>
+    {% endif %}
+
+    {% if user %}
+      <nav style="display: flex;">
+    {% else %}
+      <nav style="display: none;">
+    {% endif %}
+      <button onclick="showSection('home')">🏠 Home</button>
+      <button onclick="showSection('result')">🔍 Result</button>
+      <button onclick="showSection('feedback')">📋 Feedback</button>
+      <button onclick="showSection('features')">🛠️ Features</button>
+    </nav>
+
+    <!-- Home -->
+    <section id="home"{% if user %} class="active"{% endif %}>
+      <h3>Type or speak your issue:</h3>
+      <textarea id="userInput" placeholder="e.g. I want to check my ration card status"></textarea>
+      <button onclick="saveAndShowResult()">Submit</button>
+      <button onclick="startListening()">🎤 Speak</button>
+    </section>
+
+    <!-- Result -->
+    <section id="result">
+      <h3>🔍 Identified Service</h3>
+      <p><strong>Your Query:</strong> <span id="queryText"></span></p>
+      <div id="serviceAnswer" style="margin-top: 15px; line-height: 1.6;"></div>
+
+      <label for="aadhaarInput"><strong>Enter Aadhaar Number:</strong></label>
+      <input type="text" id="aadhaarInput" placeholder="e.g. 1234 5678 9012" maxlength="14" />
+      <button onclick="checkPaymentStatus()">🔎 Search</button>
+      <div id="paymentResult" style="margin-top: 15px;"></div>
+
+      <div id="extraDetails" class="hidden-section">
+        <h4>✅ Additional Details</h4>
+        <p id="pensionDetails" style="display:none;"><strong>Pension:</strong> ₹1,500 deposited on 05 June 2025 (SBI XXXX1234)</p>
+        <p id="rationDetails" style="display:none;"><strong>Ration Card:</strong> Active for 4 family members. Subsidy credited monthly.</p>
+        <p id="panDetails" style="display:none;"><strong>PAN Card:</strong> Valid and linked. Last ITR for FY 2023-24 filed.</p>
+      </div>
+
+      <p style="margin-top: 20px;">
+        <strong>Need Help?</strong> Call 
+        <a href="tel:1800110001" class="tel-link">1800-11-0001</a>
+      </p>
+    </section>
+
+    <!-- Feedback -->
+    <section id="feedback">
+      <h3>📋 Feedback from Test Users</h3>
+      <ul>
+        <li>✅ Were they able to describe their issue?</li>
+        <li>✅ Did they find the steps clear?</li>
+        <li>✅ Did it reduce their confusion?</li>
+        <li>📏 Measure: Task time & satisfaction (to be noted manually)</li>
+      </ul>
+
+      <h4>📨 Submit Your Feedback</h4>
+      <input type="text" id="userName" placeholder="Your Name (optional)">
+      <select id="userRating">
+        <option value="">Rate the experience (1–5)</option>
+        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+        <option value="4">⭐⭐⭐⭐ Good</option>
+        <option value="3">⭐⭐⭐ Average</option>
+        <option value="2">⭐⭐ Needs Improvement</option>
+        <option value="1">⭐ Poor</option>
+      </select>
+      <textarea id="userComment" placeholder="Your comments..."></textarea>
+      <button onclick="submitFeedback()">Submit Feedback</button>
+
+      <div id="feedbackList"></div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+      <h3>🛠️ Features & Support</h3>
+
+      <details open><summary>🌐 Language Selection</summary>
+        <select onchange="alert('Language switched to: ' + this.value)">
+          <option>English</option>
+          <option>हिंदी (Hindi)</option>
+          <option>తెలుగు (Telugu)</option>
+          <option>বাংলা (Bengali)</option>
+          <option>தமிழ் (Tamil)</option>
+          <option>मराठी (Marathi)</option>
+          <option>ગુજરાતી (Gujarati)</option>
+          <option>ಕನ್ನಡ (Kannada)</option>
+          <option>മലയാളം (Malayalam)</option>
+        </select>
+      </details>
+
+      <details><summary>🤖 Chatbot / Live Assistant</summary>
+        <div class="chat-box" id="chatBox">
+          <p class="bot-msg">Bot: Hello! How can I assist you today?</p>
+        </div>
+        <input type="text" id="chatInput" placeholder="Ask a question..." />
+        <button onclick="chat()">Send</button>
+      </details>
+
+      <details><summary>❓ Frequently Asked Questions</summary>
+        <p><strong>Q:</strong> How can I check my pension status?<br><strong>A:</strong> Enter your Aadhaar and click on "Search".</p>
+        <p><strong>Q:</strong> What to do if my pension is delayed?<br><strong>A:</strong> Contact the helpline or check for any pending verification.</p>
+        <p><strong>Q:</strong> Is my data stored securely?<br><strong>A:</strong> Yes. Your Aadhaar is not saved and is used only for display.</p>
+        <p><strong>Q:</strong> Can I use this in other languages?<br><strong>A:</strong> Yes, switch languages using the dropdown above.</p>
+      </details>
+
+      <details><summary>🏢 Offline Kiosk Mode</summary>
+        <p>Install this tool in village offices or service centers for local access.</p>
+      </details>
+    </section>
+  </div>
+
+  <script>
+    // Global variables
+    let currentUser = null;
+    let currentToken = null;
+
+    // Utility functions
+    function showSection(sectionId) {
+      document.querySelectorAll('section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+      
+      // Show/hide navigation based on login status
+      document.querySelector('nav').style.display = sectionId === 'login' ? 'none' : 'flex';
+    }
+
+    function showError(message) {
+      alert(message); // Replace with better UI notification
+    }
+
+    function setLoading(isLoading) {
+      document.querySelectorAll('button').forEach(btn => {
+        btn.disabled = isLoading;
+      });
+      if (isLoading) {
+        document.body.style.cursor = 'wait';
+      } else {
+        document.body.style.cursor = 'default';
+      }
+    }
+
+    // API calls
+    async function login(aadhaar) {
+      if (!aadhaar || aadhaar.length !== 12) {
+        showError('Please enter a valid 12-digit Aadhaar number');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ aadhaar })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          currentToken = data.token;
+          currentUser = data.user;
+          localStorage.setItem('token', data.token);
+          showSection('home');
+        } else {
+          showError(data.error || 'Login failed');
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function detectIntent(query) {
+      try {
+        setLoading(true);
+        const response = await fetch('/detect-intent', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ query })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('queryText').textContent = query;
+          document.getElementById('serviceAnswer').innerHTML = data.response;
+          showSection('result');
+        } else {
+          showError(data.error || 'Failed to process query');
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function submitFeedback() {
+      const name = document.getElementById('userName').value;
+      const rating = document.getElementById('userRating').value;
+      const comment = document.getElementById('userComment').value;
+      
+      if (!rating) {
+        showError('Please select a rating');
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        const response = await fetch('/submit-feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ name, rating, comment })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Thank you for your feedback!');
+          document.getElementById('userName').value = '';
+          document.getElementById('userRating').value = '';
+          document.getElementById('userComment').value = '';
+          loadFeedback();
+        } else {
+          showError(data.error || 'Failed to submit feedback');
+        }
+      } catch (error) {
+        showError('Network error. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function loadFeedback() {
+      try {
+        const response = await fetch('/get-feedback', {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const feedback = await response.json();
+        
+        const feedbackList = document.getElementById('feedbackList');
+        feedbackList.innerHTML = feedback.map(f => `
+          <div class="feedback-entry">
+            <strong>${f.name || 'Anonymous'}</strong>
+            <div>Rating: ${'⭐'.repeat(f.rating)}</div>
+            <p>${f.comment}</p>
+            <small>${new Date(f.timestamp).toLocaleDateString()}</small>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load feedback:', error);
+      }
+    }
+
+    async function chat() {
+      const chatInput = document.getElementById('chatInput');
+      const message = chatInput.value.trim();
+      if (!message) return;
+      
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML += `<p class="user-msg">You: ${message}</p>`;
+      chatInput.value = '';
+      
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          chatBox.innerHTML += `<p class="bot-msg">Bot: ${data.response}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        } else {
+          chatBox.innerHTML += `<p class="bot-msg error">Sorry, I couldn't process that request.</p>`;
+        }
+      } catch (error) {
+        chatBox.innerHTML += `<p class="bot-msg error">Network error. Please try again.</p>`;
+      }
+    }
+
+    // Event handlers
+    function saveAndShowResult() {
+      const query = document.getElementById('userInput').value.trim();
+      if (!query) {
+        showError('Please enter your query');
+        return;
+      }
+      detectIntent(query);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check for saved token
+      const savedToken = localStorage.getItem('token');
+      if (savedToken) {
+        currentToken = savedToken;
+        // Verify token and get user info
+        fetch('/services', {
+          headers: { 'Authorization': `Bearer ${savedToken}` }
+        }).then(response => {
+          if (response.ok) {
+            showSection('home');
+          } else {
+            localStorage.removeItem('token');
+            showSection('login');
+          }
+        });
+      } else {
+        showSection('login');
+      }
+      
+      // Load initial feedback
+      loadFeedback();
+      
+      // Set up event listeners
+      document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') chat();
+      });
+    });
+
+    function startListening() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showError('Speech recognition is not supported in your browser');
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-IN';
+      
+      recognition.onstart = () => {
+        document.getElementById('userInput').placeholder = 'Listening...';
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userInput').value = transcript;
+        document.getElementById('userInput').placeholder = 'e.g. I want to check my ration card status';
+      };
+      
+      recognition.onerror = (event) => {
+        showError('Error with speech recognition: ' + event.error);
+        document.getElementById('userInput').placeholder = 'e.g. I want to check my ration card status';
+      };
+      
+      recognition.onend = () => {
+        document.getElementById('userInput').placeholder = 'e.g. I want to check my ration card status';
+      };
+      
+      recognition.start();
+    }
+
+    function checkPaymentStatus() {
+      const aadhaar = document.getElementById("aadhaarInput").value.trim();
+      const resultDiv = document.getElementById("paymentResult");
+      const extraDiv = document.getElementById("extraDetails");
+      const digitsOnly = aadhaar.replace(/\D/g, '');
+
+      if (!digitsOnly || digitsOnly.length !== 12) {
+        resultDiv.innerHTML = `<span style="color:red;">Please enter a valid 12-digit Aadhaar number.</span>`;
+        extraDiv.style.display = "none";
+        return;
+      }
+
+      resultDiv.innerHTML = `<span style="color:green;">Valid Aadhaar entered. Searching...</span>`;
+      setTimeout(() => {
+        resultDiv.innerHTML = `<strong>✅ Aadhaar Verified:</strong> All records retrieved successfully.`;
+        extraDiv.style.display = "block";
+
+        const query = document.getElementById("queryText").textContent.toLowerCase();
+        document.getElementById("pensionDetails").style.display = query.includes("pension") ? "block" : "none";
+        document.getElementById("rationDetails").style.display = query.includes("ration") ? "block" : "none";
+        document.getElementById("panDetails").style.display = query.includes("pan") ? "block" : "none";
+      }, 1000);
+    }
+
+    // Add script to force show nav and home section if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('nav').style.display = 'flex';
+      document.getElementById('home').classList.add('active');
+      // Hide login section if it exists
+      var loginSection = document.getElementById('login');
+      if (loginSection) loginSection.style.display = 'none';
+    });
+  </script>
+</body>
+</html> 

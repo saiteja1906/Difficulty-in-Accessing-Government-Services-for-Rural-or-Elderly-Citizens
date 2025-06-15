@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EasyGov Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #f1faff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: #fff;
+      padding: 32px 28px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 18px;
+      color: #3498db;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .sample {
+      margin-top: 18px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>EasyGov Login</h2>
+    <form method="POST" action="/login">
+      <input type="text" name="aadhaar" maxlength="12" placeholder="Aadhaar Number" required pattern="\d{12}">
+      <input type="date" name="dob" placeholder="Date of Birth" required>
+      <button type="submit">Login</button>
+    </form>
+    <div class="sample">
+      <strong>Sample Credentials:</strong><br>
+      Aadhaar: 123456789012<br>
+      DOB: 1959-06-05
+    </div>
+  </div>
+</body>
+</html> 
